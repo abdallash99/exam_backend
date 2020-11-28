@@ -1,0 +1,80 @@
+# NOTE: update this with your service name
+service: questions-service
+
+# Create an optimized package for our functions
+package:
+  individually: true
+
+plugins:
+  - serverless-bundle # Package our functions with Webpack
+  - serverless-offline
+  - serverless-dotenv-plugin # Load .env as environment variables
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  stage: dev
+  region: eu-west-1
+  environment:
+    exams: exams
+    questions: questions
+    results: results
+    userExams: userExams
+  # 'iamRoleStatements' defines the permission policy for the Lambda function.
+  # In this case Lambda functions are granted with permissions to access DynamoDB.
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Scan
+        - dynamodb:Query
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:DescribeTable
+      Resource: 'arn:aws:dynamodb:eu-west-1:*:*'
+resources:
+  # API Gateway Errors
+  - ${file(resources/api-gateway-errors.yml)}
+
+functions:
+  createQuestion:
+    handler: src/createQuestion.main
+    events:
+      - http:
+          path: exams/{id}/questions
+          method: post
+          cors: true
+          authorizer: aws_iam
+  getQuestions:
+    handler: src/getQuestions.main
+    events:
+      - http:
+          path: exams/{id}/questions
+          method: get
+          cors: true
+          authorizer: aws_iam
+  getMyQuestions:
+    handler: src/getMyQuestions.main
+    events:
+      - http:
+          path: exams/{id}/myquestions
+          method: get
+          cors: true
+          authorizer: aws_iam
+  deleteQuestion:
+    handler: src/getMyAllExam.main
+    events:
+      - http:
+          path: exams/{id}/questions/{question_id}
+          method: delete
+          cors: true
+          authorizer: aws_iam
+  updateQuestion:
+    handler: src/updateQuestion.main
+    events:
+      - http:
+          path: exams/{id}/questions/{question_id}
+          method: put
+          cors: true
+          authorizer: aws_iam

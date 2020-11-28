@@ -1,0 +1,90 @@
+service: exam-service
+
+package:
+  individually: true
+
+plugins:
+  - serverless-bundle
+  - serverless-offline
+  - serverless-dotenv-plugin
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: prod
+  region: eu-west-1
+  environment:
+    results: results
+    exams: exams
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Scan
+        - dynamodb:Query
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:DescribeTable
+      Resource: 'arn:aws:dynamodb:eu-west-1:*:*'
+resources:
+  # API Gateway Errors
+  - ${file(resources/api-gateway-errors.yml)}
+
+functions:
+  createExam:
+    handler: src/createExam.main
+    events:
+      - http:
+          path: exams
+          method: post
+          cors: true
+          authorizer: aws_iam
+  getMyAllExam:
+    handler: src/getMyAllExam.main
+    events:
+      - http:
+          path: exams/me
+          method: get
+          cors: true
+          authorizer: aws_iam
+  getAllExam:
+    handler: src/getAllExam.main
+    events:
+      - http:
+          path: exams
+          method: get
+          cors: true
+          authorizer: aws_iam
+  getExam:
+    handler: src/getExam.main
+    events:
+      - http:
+          path: exams/{id}
+          method: get
+          cors: true
+          authorizer: aws_iam
+  updateExam:
+    handler: src/updateExam.main
+    events:
+      - http:
+          path: exams/{id}
+          method: put
+          cors: true
+          authorizer: aws_iam
+  addExam:
+    handler: src/addExam.main
+    events:
+      - http:
+          path: exams/{id}
+          method: post
+          cors: true
+          authorizer: aws_iam
+  deleteExam:
+    handler: src/deleteExam.main
+    events:
+      - http:
+          path: exams/{id}
+          method: delete
+          cors: true
+          authorizer: aws_iam
