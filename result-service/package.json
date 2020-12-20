@@ -1,5 +1,5 @@
 {
-  "name": "questions-service",
+  "name": "result-service",
   "version": "2.2.0",
   "description": "A Node.js starter for Serverless Framework with ES6 and TypeScript support",
   "main": "handler.js",
@@ -18,8 +18,6 @@
     "serverless-offline": "^5.3.3"
   },
   "dependencies": {
-    "aws-sdk": "^2.799.0",
-    "moment": "^2.29.1",
-    "uuid": "^8.3.1"
+    "moment": "^2.29.1"
   }
 }

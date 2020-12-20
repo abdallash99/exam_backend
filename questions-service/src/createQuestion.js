@@ -12,7 +12,7 @@ export const main = handler(async (event, context) => {
         TableName: process.env.questions,
         Item: {
             examId: event.pathParameters.id,
-            questionId: uuid.v1(),
+            questionId: uuid.v4(),
             question,
             answers,
             correct

@@ -1,5 +1,5 @@
 # NOTE: update this with your service name
-service: questions-service
+service: result-service
 
 # Create an optimized package for our functions
 package:
@@ -20,6 +20,7 @@ provider:
     questions: questions
     results: results
     userExams: userExams
+    saved: saved
   # 'iamRoleStatements' defines the permission policy for the Lambda function.
   # In this case Lambda functions are granted with permissions to access DynamoDB.
   iamRoleStatements:
@@ -38,43 +39,35 @@ resources:
   - ${file(resources/api-gateway-errors.yml)}
 
 functions:
-  createQuestion:
-    handler: src/createQuestion.main
+  startExam:
+    handler: src/startExam.main
     events:
       - http:
-          path: exams/{id}/questions
-          method: post
+          path: attempt/{id}
+          method: get
           cors: true
           authorizer: aws_iam
   getQuestions:
     handler: src/getQuestions.main
     events:
       - http:
-          path: exams/{id}/questions
+          path: attemptq/{id}
           method: get
           cors: true
           authorizer: aws_iam
-  getMyQuestions:
-    handler: src/getMyQuestions.main
+  saveQuestionAnswer:
+    handler: src/saveQuestionAnswer.main
     events:
       - http:
-          path: exams/{id}/myquestions
+          path: attempt/{id}
+          method: post
+          cors: true
+          authorizer: aws_iam
+  endExam:
+    handler: src/endExam.main
+    events:
+      - http:
+          path: end/{id}
           method: get
-          cors: true
-          authorizer: aws_iam
-  deleteQuestion:
-    handler: src/deleteQuestion.main
-    events:
-      - http:
-          path: exams/{id}/questions/{question_id}
-          method: delete
-          cors: true
-          authorizer: aws_iam
-  updateQuestion:
-    handler: src/updateQuestion.main
-    events:
-      - http:
-          path: exams/{id}/questions/{question_id}
-          method: put
           cors: true
           authorizer: aws_iam

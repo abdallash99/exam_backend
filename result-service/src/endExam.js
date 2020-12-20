@@ -1,18 +1,15 @@
 import handler from "../libs/handler-lib";
 import dynamoDb from "../libs/dynamodb-lib";
-
+import canAccess from "../libs/canAccess";
 export const main = handler(async (event, context) => {
-    const data = JSON.parse(event.body);
-    const { name, description, startDate, endDate } = data;
+    const res = await canAccess(event);
+    if (res !== 200) return { statusCode: res };
     const params = {
-        TableName: process.env.exams,
+        TableName: process.env.results,
         Item: {
             userId: event.requestContext.identity.cognitoIdentityId,
             examId: event.pathParameters.id,
-            name,
-            description,
-            startDate,
-            endDate,
+            status: "ended"
         }
     };
 

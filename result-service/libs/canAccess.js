@@ -1,7 +1,7 @@
-import handler from "../libs/handler-lib";
-import dynamoDb from "../libs/dynamodb-lib";
 import moment from 'moment';
-export const main = handler(async (event, context) => {
+import dynamoDb from './dynamodb-lib';
+
+export default async function (event) {
     const now = moment().format('YYYY-MM-DDTHH:mm');
     const result = await dynamoDb.query({
         TableName: process.env.exams,
@@ -14,22 +14,27 @@ export const main = handler(async (event, context) => {
             '#examId': 'examId',
         },
     });
+    const params = {
+        TableName: process.env.results,
+
+        Key: {
+            userId: event.requestContext.identity.cognitoIdentityId,
+            examId: event.pathParameters.id
+        }
+    };
+
+    const result4 = await dynamoDb.get(params);
+
+    if (!result4.Item)
+        return 404;
+    if (result4.Item.status === "ended")
+        return 400;
+
     if (result.Items.length !== 0) {
         const { startDate, endDate } = result.Items[0];
         if (startDate > now || endDate <= now) {
             return { statusCode: 403 };
         }
     } else return { statusCode: 404 };
-    const params = {
-        TableName: process.env.questions,
-        KeyConditionExpression: "examId = :examId",
-        ExpressionAttributeValues: {
-            ":examId": event.pathParameters.id
-        },
-        ProjectionExpression: "examId, questionId, answers, question",
-    };
-
-    const result1 = await dynamoDb.query(params);
-
-    return { body: result1.Items, statusCode: 200 };
-});
+    return 200;
+}
