@@ -3,7 +3,7 @@ import dynamoDb from "../libs/dynamodb-lib";
 import canAccess from "../libs/canAccess";
 export const main = handler(async (event, context) => {
     const res = await canAccess(event);
-    if (res !== 200) return { statusCode: res };
+    if (res.statusCode !== 200) return res;
     const params = {
         TableName: process.env.results,
         Item: {

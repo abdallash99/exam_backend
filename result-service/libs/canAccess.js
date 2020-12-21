@@ -2,7 +2,7 @@ import moment from 'moment';
 import dynamoDb from './dynamodb-lib';
 
 export default async function (event) {
-    const now = moment().format('YYYY-MM-DDTHH:mm');
+    const now = moment().add(2, 'hours').format('YYYY-MM-DDTHH:mm');
     const result = await dynamoDb.query({
         TableName: process.env.exams,
         IndexName: "examId-index",
@@ -26,9 +26,9 @@ export default async function (event) {
     const result4 = await dynamoDb.get(params);
 
     if (!result4.Item)
-        return 404;
+        return { statusCode: 404 };
     if (result4.Item.status === "ended")
-        return 400;
+        return { statusCode: 403 };
 
     if (result.Items.length !== 0) {
         const { startDate, endDate } = result.Items[0];
@@ -36,5 +36,5 @@ export default async function (event) {
             return { statusCode: 403 };
         }
     } else return { statusCode: 404 };
-    return 200;
+    return { statusCode: 200, body: result };
 }

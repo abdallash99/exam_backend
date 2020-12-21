@@ -3,7 +3,7 @@ import canAccess from "../libs/canAccess";
 import dynamodbLib from "../libs/dynamodb-lib";
 export const main = handler(async (event, context) => {
     const res = await canAccess(event);
-    if (res !== 200) return { statusCode: res };
+    if (res.statusCode !== 200) return res;
     const data = JSON.parse(event.body);
     const { questionId, correct } = data;
     if (!correct) return { statusCode: 400 };

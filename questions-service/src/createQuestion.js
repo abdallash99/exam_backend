@@ -5,7 +5,7 @@ import dynamoDb from "../libs/dynamodb-lib";
 export const main = handler(async (event, context) => {
     const data = JSON.parse(event.body);
     const { question, answers, correct } = data;
-    if (!question || answers.length < 2 || !correct || correct >= answers.length || correct < 0) {
+    if (!question || answers.length < 2 || !correct || parseInt(correct) >= answers.length || parseInt(correct) < 0) {
         return { statusCode: 400 };
     }
     const params = {

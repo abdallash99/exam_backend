@@ -2,17 +2,18 @@ import handler from "../libs/handler-lib";
 import dynamoDb from "../libs/dynamodb-lib";
 
 export const main = handler(async (event, context) => {
-    const params = {
+    const result = await dynamoDb.query({
         TableName: process.env.exams,
-
-        Key: {
-            userId: event.requestContext.identity.cognitoIdentityId,
-            examId: event.pathParameters.id
-        }
-    };
-
-    const result = await dynamoDb.get(params);
-    if (!result.Item) {
+        IndexName: "examId-index",
+        KeyConditionExpression: '#examId = :examId',
+        ExpressionAttributeValues: {
+            ':examId': event.pathParameters.id,
+        },
+        ExpressionAttributeNames: {
+            '#examId': 'examId',
+        },
+    });
+    if (result.Items.length === 0) {
         return { statusCode: 404 };
     }
 

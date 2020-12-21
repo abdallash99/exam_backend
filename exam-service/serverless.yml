@@ -60,7 +60,7 @@ functions:
     handler: src/getExam.main
     events:
       - http:
-          path: exams/{id}
+          path: exam/{id}
           method: get
           cors: true
           authorizer: aws_iam
