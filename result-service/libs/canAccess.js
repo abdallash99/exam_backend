@@ -27,7 +27,7 @@ export default async function (event) {
 
     if (!result4.Item)
         return { statusCode: 404 };
-    if (result4.Item.status === "ended")
+    if (result4.Item.status === "ended" || result4.Item.status === "graded")
         return { statusCode: 403 };
 
     if (result.Items.length !== 0) {
