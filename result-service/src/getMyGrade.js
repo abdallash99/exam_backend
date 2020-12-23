@@ -12,7 +12,7 @@ export const main = handler(async (event, context) => {
         }
     });
     if (result4.Item.status === 'graded')
-        return { statusCode: 200, body: result4.Item.grade };
+        return { statusCode: 200, body: { finalGrade: result4.Item.grade } };
     const result = await dynamoDb.query({
         TableName: process.env.questions,
         KeyConditionExpression: "examId = :examId",
