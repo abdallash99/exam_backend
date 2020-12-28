@@ -1,6 +1,7 @@
 import handler from "../libs/handler-lib";
 import dynamoDb from "../libs/dynamodb-lib";
 import grade from "../libs/grade";
+
 export const main = handler(async (event, context) => {
 
     const result4 = await dynamoDb.get({
@@ -34,14 +35,20 @@ export const main = handler(async (event, context) => {
     const answers = result1.Items;
     const finalGrade = grade(questions, answers);
 
-    await dynamoDb.put({
+    await dynamoDb.update({
         TableName: process.env.results,
-        Item: {
+        Key: {
             userId: event.requestContext.identity.cognitoIdentityId,
             examId: event.pathParameters.id,
-            status: "graded",
-            grade: finalGrade
-        }
+        },
+        UpdateExpression: "set #status = :r, grade = :d",
+        ExpressionAttributeValues: {
+            ":r": "graded",
+            ":d": finalGrade
+        },
+        ExpressionAttributeNames: {
+            '#status': 'status',
+        },
     });
 
 

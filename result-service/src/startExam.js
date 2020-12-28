@@ -2,7 +2,11 @@ import handler from "../libs/handler-lib";
 import dynamoDb from "../libs/dynamodb-lib";
 import addToSavedLib from "../libs/addToSaved-lib";
 import canAccess from "../libs/canAccess";
+import moment from 'moment';
+
 export const main = handler(async (event, context) => {
+    const now = moment().add(2, 'hours').format('YYYY-MM-DDTHH:mm');
+
     const res = await canAccess(event);
     const exam = await dynamoDb.get({
         TableName: process.env.results,
@@ -29,14 +33,21 @@ export const main = handler(async (event, context) => {
 
     const param = {
         TableName: process.env.results,
-        Item: {
+        Key: {
             userId: event.requestContext.identity.cognitoIdentityId,
             examId: event.pathParameters.id,
-            status: "started"
-        }
+        },
+        UpdateExpression: "set #status = :r, startDate = :d",
+        ExpressionAttributeValues: {
+            ":r": "started",
+            ":d": now
+        },
+        ExpressionAttributeNames: {
+            '#status': 'status',
+        },
     };
 
-    await dynamoDb.put(param);
+    await dynamoDb.update(param);
 
     return { body: { questions: result1.Items, exam: res.body.Items[0] }, statusCode: 200 };
 });

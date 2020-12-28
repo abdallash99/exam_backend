@@ -79,3 +79,11 @@ functions:
           method: get
           cors: true
           authorizer: aws_iam
+  getExamGrade:
+    handler: src/getExamGrade.main
+    events:
+      - http:
+          path: mygrade/{id}
+          method: get
+          cors: true
+          authorizer: aws_iam
