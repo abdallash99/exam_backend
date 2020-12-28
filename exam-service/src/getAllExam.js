@@ -24,5 +24,5 @@ export const main = handler(async (event, context) => {
     const exams = await Promise.all(promis);
     let finalExams = [];
     exams.forEach((item) => item.Items.forEach(innerItem => finalExams.push(innerItem)));
-    return { body: finalExams, statusCode: 200 };
+    return { body: { finalExams, result: result.Items }, statusCode: 200 };
 });
